@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\BookController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SiteController;
+use App\Models\Book;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,21 +16,25 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/index', [SiteController::class, 'index']);
+Route::get('/choose_copy/{bookType}', [SiteController::class, 'chooseCopy']);
 
-Route::get('/index', function () {
-    return view('index');
-});
+Route::post('/purchase/{bookType}', [SiteController::class, 'purchase']);
+
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+
+
 Route::get('/admin', function () {
     return view('admin.index');
 });
 
-Route::get('/books', [SiteController::class, 'index'])->name('books.index');
-Route::get('/api/books', [SiteController::class, 'getBooks'])->name('books.get');
+Route::get('/first-book', [BookController::class, 'getFirstBook']);
+
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');

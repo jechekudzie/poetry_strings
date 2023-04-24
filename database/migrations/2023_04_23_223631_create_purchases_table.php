@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedInteger('quantity');
             $table->string('currency');
             $table->decimal('price', 8, 2);
+            $table->decimal('amount', 8, 2);
             $table->unsignedBigInteger('payment_method_id');
             $table->string('proof_of_payment')->nullable();
             $table->string('purchase_order_number')->unique();

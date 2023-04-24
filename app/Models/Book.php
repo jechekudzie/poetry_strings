@@ -15,11 +15,33 @@ class Book extends Model
         'description',
         'cover_image'
     ];
+    protected $appends = ['book_types'];
 
     public function bookTypes()
     {
         return $this->hasMany(BookType::class);
     }
+
+    public function getBookTypesAttribute()
+    {
+        return $this->bookTypes()->get()->toArray();
+    }
+
+    public function getIdByType($type)
+    {
+        return $this->bookTypes()->where('name', $type)->firstOrFail();
+    }
+
+    public function getSoftCopy()
+    {
+        return $this->getIdByType('Softcopy');
+    }
+
+    public function getHardCopy()
+    {
+        return $this->getIdByType('Hardcopy');
+    }
+
 
     public function getPriceByType($type)
     {
