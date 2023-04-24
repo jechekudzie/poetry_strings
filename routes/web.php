@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,6 +22,13 @@ Route::get('/index', function () {
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/admin', function () {
+    return view('admin.index');
+});
+
+Route::get('/books', [SiteController::class, 'index'])->name('books.index');
+Route::get('/api/books', [SiteController::class, 'getBooks'])->name('books.get');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
