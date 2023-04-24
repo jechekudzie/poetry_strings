@@ -16,15 +16,12 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/index', [SiteController::class, 'index']);
+Route::get('/', [SiteController::class, 'index']);
 Route::get('/choose_copy/{bookType}', [SiteController::class, 'chooseCopy']);
 
 Route::post('/purchase/{bookType}', [SiteController::class, 'purchase']);
 
-
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/paynow/{purchase}', [SiteController::class, 'paynow']);
 
 
 

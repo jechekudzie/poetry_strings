@@ -5,7 +5,6 @@
 
     <div class="banner">
         <button class="btn btn-primary buy-now-btn" data-toggle="modal" data-target="#order">Buy Now</button>
-
         <div class="banner-text">RUTH TSOPOTSA</div>
     </div>
 
@@ -13,6 +12,16 @@
     <section class="book-section">
         <div class="container">
             <div class="row">
+                @if(session('message'))
+                    <div class="alert alert-success" role="alert">
+                        <h4 class="alert-heading">Well done!</h4>
+                        <p>{{session('message')}}</p>
+                        <hr>
+                        <p class="mb-0">Whenever you need to, be sure to use margin utilities to keep things nice and
+                            tidy.</p>
+                    </div>
+                @endif
+
                 <div class="col-md-6">
                     <div class="embed-responsive embed-responsive-16by9">
                         <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/VIDEO_ID"

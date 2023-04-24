@@ -5,7 +5,6 @@ html, body {
 /* Give the footer a fixed height */
 .footer {
     height: 60px;
-    padding-bottom: 30px;
 }
 
 /* Add padding to the bottom of the page */

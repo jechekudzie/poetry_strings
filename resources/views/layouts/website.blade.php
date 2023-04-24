@@ -10,11 +10,12 @@
 
     <title>Poetry Strings - Oasis In Crisis</title>
 
+
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{asset('styles.css')}}">
+    <link href="{{url('custom.css')}}" rel="stylesheet">
 
     @livewireStyles
 </head>
@@ -49,6 +50,7 @@
 <div class="page-content">
     <!-- Navbar -->
     @yield('content')
+
     <livewire:order/>
 </div>
 <footer style="padding-top: 100px;" class="footer bg-dark text-white py-3">

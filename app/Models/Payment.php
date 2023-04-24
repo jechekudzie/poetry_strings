@@ -9,14 +9,16 @@ class Payment extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'purchase_id',
-        'payment_method_id',
-        'payment_status_id',
-        'amount',
-        'transaction_id',
-        'poll_url',
-    ];
+    /* protected $fillable = [
+         'purchase_id',
+         'payment_method_id',
+         'payment_status_id',
+         'amount',
+         'transaction_id',
+         'poll_url',
+     ];*/
+
+    protected $guarded = [];
 
     public function purchase()
     {
