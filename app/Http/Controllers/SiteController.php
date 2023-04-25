@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\PurchaseConfirmation;
 use App\Models\Book;
 use App\Models\Payment;
 use App\Models\BookStore;
 use App\Models\BookType;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Paynow\Payments\Paynow;
 
@@ -36,6 +38,9 @@ class SiteController extends Controller
         $book = $bookType->book;
         // Validate the form input
         $data = request()->validate([
+            'name' => 'required',
+            'email' => 'required',
+            'phone' => 'required',
             'book_store_id' => 'required',
             'quantity' => 'required|numeric|min:1',
         ]);
@@ -49,19 +54,20 @@ class SiteController extends Controller
         $purchaseOrderNumber = $prefix . str_pad($nextPurchaseOrderNumber, $zeroFillLength, '0', STR_PAD_LEFT);
 
         // Create a new purchase object
-        $purchase = new Purchase([
+        $purchase =  Purchase::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'],
             'book_id' => $book->id,
             'book_type_id' => $bookType->id,
             'book_store_id' => $data['book_store_id'],
             'quantity' => $data['book_store_id'],
             'currency' => 'ZWL',
             'price' => $bookType->price,
+            'amount' => $amount,
             'payment_method_id' => 1,
             'purchase_order_number' => $purchaseOrderNumber
         ]);
-
-        // Save the purchase to the database
-        $purchase->save();
 
         // Paynow logic
         $id = time() . $amount;
@@ -109,7 +115,7 @@ class SiteController extends Controller
 
         $payNowStatus = $response->status();
 
-       //dd($payNowStatus);
+        //dd($payNowStatus);
         $payNowTransactionReference = $response->reference();
         $payNowReference = $response->paynowreference();
 
@@ -119,13 +125,17 @@ class SiteController extends Controller
                 'purchase_id' => $purchase->id,
                 'payment_method_id' => 1,
                 'payment_status_id' => 1,
-                'amount' => 1,
+                'amount' => $payment['amount'],
                 'transaction_id' => $payNowReference,
                 'poll_url' => $poll_url,
 
             ]);
 
-            return redirect('/')->with('message', 'Your purchase was successful, your Purchase Order Number is: ' . $purchase->purchase_order_number);
+            // fill in the purchase details
+            Mail::to($purchase->email)->send(new PurchaseConfirmation($purchase));
+            // redirect to thank you page
+
+            return redirect('/purchase_confirmation/' . $purchase->id)->with('message', 'Your purchase was successful, your Purchase Order Number is: ' . $purchase->purchase_order_number);
 
         } elseif ($payNowStatus == 'cancelled') {
             return redirect('/')->with('message', 'Your purchase was cancelled, your Purchase Order Number is: ' . $purchase->purchase_order_number);
@@ -134,6 +144,11 @@ class SiteController extends Controller
             return redirect('/')->with('message', 'Your purchase was unsuccessful, your Purchase Order Number is: ' . $purchase->purchase_order_number);
         }
 
+    }
+
+    public function purchase_confirmation(Purchase $purchase)
+    {
+        return view('purchase_confirmation', compact('purchase'));
     }
 
     public function paynowIntegration($purchase)
@@ -145,12 +160,12 @@ class SiteController extends Controller
             'http://localhost:8000/paynow/' . $purchase->id
         );
 
-       /* $paynow = new Paynow(
-            '5865',
-            '23962222-9610-4f7c-bbd5-7e12f19cdfc6',
-            'http://localhost:8000/paynow/' . $purchase->id,
-            'http://localhost:8000/paynow/' . $purchase->id
-        );*/
+        /* $paynow = new Paynow(
+             '5865',
+             '23962222-9610-4f7c-bbd5-7e12f19cdfc6',
+             'http://localhost:8000/paynow/' . $purchase->id,
+             'http://localhost:8000/paynow/' . $purchase->id
+         );*/
         return $paynow;
 
     }

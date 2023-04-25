@@ -11,16 +11,15 @@
     <!-- Book section -->
     <section class="book-section">
         <div class="container">
+            @if(session('message'))
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading">Payment update!</h4>
+
+                    <hr>
+                    <p>{{session('message')}}</p>
+                </div>
+            @endif
             <div class="row">
-                @if(session('message'))
-                    <div class="alert alert-success" role="alert">
-                        <h4 class="alert-heading">Well done!</h4>
-                        <p>{{session('message')}}</p>
-                        <hr>
-                        <p class="mb-0">Whenever you need to, be sure to use margin utilities to keep things nice and
-                            tidy.</p>
-                    </div>
-                @endif
 
                 <div class="col-md-6">
                     <div class="embed-responsive embed-responsive-16by9">
@@ -100,53 +99,55 @@
         </div>
     </div>
 
-
-    <!-- Book poem episode -->
-    <section class="episode-section">
-        <div class="container">
-            <div class="episode-section-title">Oasis In Crisis</div>
-            <div class="row">
-                <!-- Replace the videoId with the actual YouTube video ID -->
-                <!-- Repeat this block for each episode (12 times total) -->
-                <div class="col-md-4 col-sm-6">
-                    <div class="episode">
-                        <div class="episode-title">Episode 1</div>
-                        <iframe width="100%" height="200" src="https://www.youtube.com/embed/videoId"
-                                frameborder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen></iframe>
-                        <div class="episode-caption">Episode 1: The Beginning</div>
-                    </div>
-                </div>
-                <!-- End of the episode block -->
-                <!-- Repeat this block for each episode (12 times total) -->
-                <div class="col-md-4 col-sm-6">
-                    <div class="episode">
-                        <div class="episode-title">Episode 2</div>
-                        <iframe width="100%" height="200" src="https://www.youtube.com/embed/videoId"
-                                frameborder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen></iframe>
-                        <div class="episode-caption">Episode 2: The Second</div>
-                    </div>
-                </div>
-                <!-- End of the episode block -->
-                <!-- Repeat this block for each episode (12 times total) -->
-                <div class="col-md-4 col-sm-6">
-                    <div class="episode">
-                        <div class="episode-title">Episode 3</div>
-                        <iframe width="100%" height="200" src="https://www.youtube.com/embed/videoId"
-                                frameborder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen></iframe>
-                        <div class="episode-caption">Episode 3: The Third</div>
-                    </div>
-                </div>
-                <!-- End of the episode block -->
-
+    <div style="padding-top: 20px;" class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="text-center mb-5">Oasis In Crisis</h2>
             </div>
         </div>
-    </section>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <video class="embed-responsive-item" controls>
+                            <source src="{{ url('/video/Poetry Reading 1 - Perfectly Imperfect.mp4') }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title" style="text-align: center">Perfectly Imperfect</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <video class="embed-responsive-item" controls>
+                            <source src="{{url('/video/Poetry Reading 2 - Mouse in my House .mp4')}}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title" style="text-align: center">Mouse in my House</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <video class="embed-responsive-item" controls>
+                            <source src="{{ url('video/Reading 3 - Silence.mp4') }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title" style="text-align: center">Silence</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 @endsection
 

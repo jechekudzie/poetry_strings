@@ -16,19 +16,21 @@ return new class extends Migration
             $table->unsignedBigInteger('book_id');
             $table->unsignedBigInteger('book_type_id')->nullable();
             $table->unsignedBigInteger('book_store_id');
-            $table->unsignedBigInteger('user_id');
             $table->unsignedInteger('quantity');
             $table->string('currency');
             $table->decimal('price', 8, 2);
             $table->decimal('amount', 8, 2);
-            $table->unsignedBigInteger('payment_method_id');
+            $table->unsignedBigInteger('payment_method_id')->default(1);
             $table->string('proof_of_payment')->nullable();
             $table->string('purchase_order_number')->unique();
+
+            $table->string('name');
+            $table->string('email');
+            $table->string('phone');
 
             $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade');
             $table->foreign('book_type_id')->references('id')->on('book_types')->onDelete('cascade');
             $table->foreign('book_store_id')->references('id')->on('book_stores')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('payment_method_id')->references('id')->on('payment_methods')->onDelete('cascade');
             $table->timestamps();
         });

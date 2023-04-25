@@ -17,9 +17,13 @@ class Purchase extends Model
         'quantity',
         'currency',
         'price',
+        'amount',
         'payment_method_id',
         'proof_of_payment',
-        'purchase_order_number'
+        'purchase_order_number',
+        'name',
+        'email',
+        'phone',
     ];
 
     public function book()

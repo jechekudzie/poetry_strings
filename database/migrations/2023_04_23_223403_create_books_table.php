@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('author');
             $table->text('description')->nullable();
             $table->string('cover_image')->nullable();
+            $table->string('pdf_file')->nullable();
+            $table->string('epub_file')->nullable();
             $table->timestamps();
         });
     }

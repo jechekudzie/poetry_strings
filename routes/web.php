@@ -23,6 +23,8 @@ Route::post('/purchase/{bookType}', [SiteController::class, 'purchase']);
 
 Route::get('/paynow/{purchase}', [SiteController::class, 'paynow']);
 
+Route::get('/purchase_confirmation/{purchase}', [SiteController::class, 'purchase_confirmation']);
+
 
 
 Route::get('/admin', function () {
