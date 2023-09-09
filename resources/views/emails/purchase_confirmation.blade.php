@@ -665,9 +665,9 @@
                                         <td width="460"
                                             style="font-size: 16px; color: #b8b9c1; font-weight: normal; text-align: center; font-family: Averta, sans-serif; line-height: 24px; vertical-align: top;"
                                             class="fontSmaller">
-                                            <img
-                                                src="https://wave-prod-accounting.s3.amazonaws.com/uploads/invoices/business_logos/7df29bfe-597e-4ca3-b417-189bda5b0af5.png"
-                                                style="margin:0 0 20px 0; width: 180px" width="180">
+                                            <img src="{{url('card/poetry-strings-logo-white-rgb-2000px@144ppi.png')}}"
+                                                 style="background-color:#132839;margin:0 0 20px 0; width: 200px; height: 100px"
+                                                 width="200">
                                         </td>
                                         <td width="40"></td>
                                     </tr>
@@ -816,7 +816,7 @@
                                                 <span style="white-space:nowrap;font-weight:normal;font-size:12px;">
                                                       &nbsp;
                                                     <!-- Manual payment -->
-                                                      {{$purchase->payment->paymentMethod->name}}
+                                                      {{$purchase->paymentMethod->name}}
                                                    </span>
                                             </p>
                                             <br>
@@ -876,9 +876,10 @@
                                             <span style="white-space:nowrap;font-weight:normal;font-size:12px;">
                                                       &nbsp;
                                                 <!-- Manual payment -->
-                                                <a href="{{url($purchase->book->pdf_file)}}">PDF version</a><br/>
-                                                      <a href="{{url($purchase->book->pdf_file)}}">Epub Version</a>
-                                                   </span>
+                                                <a href="@if($purchase->book->pdf_file !=null){{url($purchase->book->pdf_file)}}@endif">PDF version</a>
+                                                <br/>
+                                                <a href="@if($purchase->book->epub_file !=null){{url($purchase->book->epub_file)}}@endif">Epub Version</a>
+                                            </span>
                                         </p>
                                         <br>
                                     </tr>

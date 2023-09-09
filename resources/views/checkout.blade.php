@@ -1,4 +1,4 @@
-@extends('layouts.website')
+@extends('layouts.website1')
 
 @section('content')
 
@@ -36,7 +36,7 @@
         </nav>
         <div class="py-5 text-center">
             <h2>Checkout form</h2>
-            <p class="lead">Instruction goes here</p>
+<!--            <p class="lead">Instruction goes here</p>-->
         </div>
 
         <div class="row">
@@ -54,19 +54,11 @@
                         <span id="price" class="text-muted">$12</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between">
-                        <span>Total (USD)</span>
-                        <strong id="total_price"> </strong>
+                        <span id="currencySelected"></span>
+                        <strong id="total_price"></strong>
                     </li>
                 </ul>
 
-                <form class="card p-2">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Promo code">
-                        <div class="input-group-append">
-                            <button type="submit" class="btn btn-secondary">Redeem</button>
-                        </div>
-                    </div>
-                </form>
             </div>
             <div class="col-md-8 order-md-1">
                 <h4 class="mb-3">Billing Details</h4>
@@ -92,9 +84,9 @@
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="email">Email <span class="text-muted">(Optional)</span></label>
+                            <label for="email">Email <span class="text-muted"></span></label>
                             <input type="email" class="form-control" name="email" id="email"
-                                   placeholder="you@example.com">
+                                   placeholder="you@example.com" required>
                             <div class="invalid-feedback">
                                 Please enter a valid email address for shipping updates.
                             </div>
@@ -116,23 +108,29 @@
                             </div>
                         </div>
 
-                        <div class="col-md-5 mb-3">
+                        <div class="col-md-12 mb-3">
                             <label for="country">Book Store</label>
                             <select class="custom-select d-block w-100" name="book_store_id" id="book_store_id"
                                     required>
                                 <option value="">Choose...</option>
                                 @if($bookType->name == 'Softcopy')
-                                    @foreach($bookStores->whereIn('id', [1, 2])->all() as $bookstore)
-                                        <option value="{{$bookstore->id}}">{{$bookstore->name}}</option>
+                                    @foreach($bookStores->whereIn('id', [5])->all() as $bookstore)
+                                        <option
+                                            value="{{$bookstore->id}}">{{$bookstore->name.' (Store: '.$bookstore->address}}
+                                            )
+                                        </option>
+                                        <p>Available store at this Location: {{$bookstore}}</p>
                                     @endforeach
                                 @else
-                                    @foreach ($bookStores->whereNotIn('id', [1, 2])->all() as $bookstore)
+                                    @foreach ($bookStores->whereNotIn('id', [5])->all() as $bookstore)
                                         <option value="{{ $bookstore->id }}">
-                                            {{ $bookstore->name }} -> {{ $bookstore->address }}
+                                            {{$bookstore->name.' (Location:'.$bookstore->address}})
                                             @if ($bookStoreStock = $bookstore->bookStoreStocks()->where('book_type_id', $bookType->id)->exists())
                                                 @if ($bookStoreStock)
-                                                    ({{ $bookstore->bookStoreStocks()->where('book_type_id', $bookType->id)->first()->quantity }}
-                                                    in stock)
+                                                    <p>
+                                                        ({{ $bookstore->bookStoreStocks()->where('book_type_id', $bookType->id)->first()->quantity }}
+                                                        in stock)
+                                                    </p>
                                                 @else
                                                     <p>Out of stock</p>
                                                 @endif
@@ -152,18 +150,38 @@
 
 
                     <hr class="mb-4">
-
-                    <h4 class="mb-3">Payment</h4>
-
+                    <h4 class="mb-3">Currency</h4>
                     <div class="d-block my-3">
                         <div class="custom-control custom-radio">
-                            <input id="credit" name="paymentMethod" type="radio" class="custom-control-input" checked
-                                   required>
-                            <label class="custom-control-label" for="credit">PayNow (online)</label>
+                            <input id="currency_zwl" name="currency" type="radio" class="custom-control-input" value="ZWL">
+                            <label class="custom-control-label" for="currency_zwl">ZWL</label>
                         </div>
                     </div>
+                    <div class="d-block my-3">
+                        <div class="custom-control custom-radio">
+                            <input id="currency_usd" name="currency" type="radio" class="custom-control-input" value="USD" checked>
+                            <label class="custom-control-label" for="currency_usd">USD</label>
+                        </div>
+                    </div>
+
+
+                    <h4 class="mb-3">Payment</h4>
+                    @foreach($paymentMethods as $paymentMethod)
+                        <div class="d-block my-3">
+                            <div class="custom-control custom-radio">
+                                <input id="{{$paymentMethod->name}}" name="payment_method_id" type="radio" class="custom-control-input"
+                                       value="{{$paymentMethod->id}}" {{$loop->first ? 'disabled' : ''}}>
+                                <label class="custom-control-label" for="{{$paymentMethod->name}}">{{$paymentMethod->name}}</label>
+                            </div>
+                        </div>
+                    @endforeach
+
+                    <input type="hidden" id="exchange_rate" name="exchange_rate" value="{{$exchangeRate->rate}}">
+
                     <hr class="mb-4">
-                    <button class="btn btn-primary btn-lg btn-block" type="submit">Continue to checkout</button>
+                    <button style="background-color: #132839;color: white;" class="btn btn-lg btn-block" type="submit">
+                        Continue to checkout
+                    </button>
                 </form>
             </div>
         </div>
@@ -174,28 +192,38 @@
 
 @push('scripts')
     <script>
-
         $(document).ready(function () {
-            // Get the price from Laravel and set it to the price span
+            // Get the price and exchange rate from Laravel and set it to the price and exchange rate spans
             var price = "{{ $bookType->price }}";
+            var exchangeRate = "{{ $exchangeRate->rate }}";
             $("#price").text("$" + price);
+            $("#exchange_rate").text(exchangeRate);
 
-            // Get the default quantity and update the badge
+            // Get the default quantity and currency selection, and update the badge and currency display
             var defaultQuantity = $("#quantity").val();
+            var defaultCurrency = $("input[name='currency']:checked").val();
             $("#quantity-badge").text(defaultQuantity);
+            $("#currencySelected").text(defaultCurrency);
 
-            // Calculate the total price based on the default quantity and price, and display it
-            var totalPrice = (price * defaultQuantity).toFixed(2);
-            $("#total_price").text("$" + totalPrice);
+            // Calculate the total price based on the default quantity, price, and exchange rate, and display it
+            var exchangeRateAdjustedPrice = defaultCurrency === "ZWL" ? price * exchangeRate : price;
+            var totalPrice = exchangeRateAdjustedPrice * parseFloat(defaultQuantity);
+            var formattedPrice = defaultCurrency === "ZWL" ? "ZWL " + totalPrice.toFixed(2) : "$" + totalPrice.toFixed(2);
+            $("#total_price").text(formattedPrice);
 
-            // Listen to changes on the quantity input and update the badge and total price
-            $("#quantity").on("change", function () {
-                var quantity = $(this).val();
+            // Listen to changes on the quantity input and currency selection, and update the badge and total price
+            $("#quantity, input[name='currency']").on("change", function () {
+                var quantity = parseFloat($("#quantity").val());
+                var currency = $("input[name='currency']:checked").val();
                 $("#quantity-badge").text(quantity);
-                var totalPrice = (price * quantity).toFixed(2);
-                $("#total_price").text("$" + totalPrice);
+                $("#currencySelected").text(currency);
+                var exchangeRateAdjustedPrice = currency === "ZWL" ? price * exchangeRate : price;
+                var totalPrice = exchangeRateAdjustedPrice * quantity;
+                var formattedPrice = currency === "ZWL" ? "ZWL " + totalPrice.toFixed(2) : "$" + totalPrice.toFixed(2);
+                $("#total_price").text(formattedPrice);
             });
         });
+
 
 
     </script>

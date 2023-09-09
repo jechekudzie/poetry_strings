@@ -4,19 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Mail\PurchaseConfirmation;
 use App\Models\Book;
+use App\Models\ExchangeRate;
 use App\Models\Payment;
 use App\Models\BookStore;
 use App\Models\BookType;
+use App\Models\PaymentMethod;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Paynow\Payments\Paynow;
 
+
 class SiteController extends Controller
 {
     //
-
     public function index()
     {
         $book = Book::with('bookTypes')->first();
@@ -28,7 +30,9 @@ class SiteController extends Controller
     {
         $book = $bookType->book;
         $bookStores = BookStore::all();
-        return view('choose_copy', compact('book', 'bookType', 'bookStores'));
+        $paymentMethods = PaymentMethod::all();
+        $exchangeRate = ExchangeRate::find(1);
+        return view('checkout', compact('book', 'bookType', 'bookStores','paymentMethods','exchangeRate'));
 
     }
 
@@ -43,9 +47,19 @@ class SiteController extends Controller
             'phone' => 'required',
             'book_store_id' => 'required',
             'quantity' => 'required|numeric|min:1',
+            'currency' => 'required',
+            'payment_method_id' => 'required',
         ]);
 
-        $amount = $bookType->price * $data['quantity'];
+        $exchangeRate = ExchangeRate::find(1);
+        //if currency is zwl multiply by exchange rate to zwl price
+        if($data['currency'] == 'ZWL'){
+            $price = $bookType->price * $exchangeRate->rate;
+            $amount =  ($bookType->price * $data['quantity']) * $exchangeRate->rate;
+        }else{
+            $price = $bookType->price;
+            $amount = $bookType->price * $data['quantity'];
+        }
 
         // Generate a purchase order number
         $prefix = 'POD';
@@ -54,51 +68,58 @@ class SiteController extends Controller
         $purchaseOrderNumber = $prefix . str_pad($nextPurchaseOrderNumber, $zeroFillLength, '0', STR_PAD_LEFT);
 
         // Create a new purchase object
-        $purchase =  Purchase::create([
+        $purchase = Purchase::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'],
             'book_id' => $book->id,
             'book_type_id' => $bookType->id,
             'book_store_id' => $data['book_store_id'],
-            'quantity' => $data['book_store_id'],
+            'quantity' => $data['quantity'],
             'currency' => 'ZWL',
-            'price' => $bookType->price,
+            'price' => $price,
             'amount' => $amount,
-            'payment_method_id' => 1,
+            'payment_method_id' => $data['payment_method_id'],
             'purchase_order_number' => $purchaseOrderNumber
         ]);
 
-        // Paynow logic
-        $id = time() . $amount;
+        if ($data['payment_method_id'] == 1) {
+            // Paynow logic
+            $id = time() . $amount;
 
-        //call paynow integration
-        $payNow = $this->paynowIntegration($purchase);
+            //call paynow integration
+            $payNow = $this->paynowIntegration($purchase);
 
-        //create a payment and add items required
-        $payment = $payNow->createPayment($id, 'nigel@leadingdigital.africa');
-        $payment->add($bookType->name, $amount);
+            //create a payment and add items required
+            $payment = $payNow->createPayment($id, 'nigel@leadingdigital.africa');
+            $payment->add($bookType->name, $amount);
 
-        //initiate payment
-        $response = $payNow->send($payment);
+            //initiate payment
+            $response = $payNow->send($payment);
 
-        if ($response->success()) {
+            if ($response->success()) {
 
-            $payment_link = $response->redirectUrl();
-            // Get the poll url (used to check the status of a transaction). You might want to save this in your DB
-            $pollUrl = $response->pollUrl();
-            //create an array of data to be saved in the database
+                $payment_link = $response->redirectUrl();
+                // Get the poll url (used to check the status of a transaction). You might want to save this in your DB
+                $pollUrl = $response->pollUrl();
+                //create an array of data to be saved in the database
 
-            $payment_data['purchase_id'] = $purchase->id;
-            $payment_data['poll_url'] = $pollUrl;
-            $payment_data['amount'] = $amount;
+                $payment_data['purchase_id'] = $purchase->id;
+                $payment_data['poll_url'] = $pollUrl;
+                $payment_data['amount'] = $amount;
 
-            session()->put('payment', $payment_data);
+                session()->put('payment', $payment_data);
 
-            return redirect($payment_link);
+                return redirect($payment_link);
+            } else {
+
+                return redirect('/checkout/' . $bookType->id);
+            }
         } else {
-
-            return redirect('/choose_copy/' . $bookType->id);
+            Mail::to($purchase->email)->send(new PurchaseConfirmation($purchase));
+            return redirect('/purchase_confirmation/' . $purchase->id)
+                ->with('message', 'Your order was successful, your Purchase Order Number is: ' . $purchase->purchase_order_number . '.
+                 Please ensure that you make Payment at the selected bookstore within 24 hours to avoid cancellation of your order.');
         }
 
     }
@@ -133,8 +154,8 @@ class SiteController extends Controller
 
             // fill in the purchase details
             Mail::to($purchase->email)->send(new PurchaseConfirmation($purchase));
-            // redirect to thank you page
 
+            // redirect to thank you page
             return redirect('/purchase_confirmation/' . $purchase->id)->with('message', 'Your purchase was successful, your Purchase Order Number is: ' . $purchase->purchase_order_number);
 
         } elseif ($payNowStatus == 'cancelled') {
@@ -146,7 +167,7 @@ class SiteController extends Controller
 
     }
 
-    public function purchase_confirmation(Purchase $purchase)
+    public function purchaseConfirmation(Purchase $purchase)
     {
         return view('purchase_confirmation', compact('purchase'));
     }
@@ -168,6 +189,12 @@ class SiteController extends Controller
          );*/
         return $paynow;
 
+    }
+
+
+    public function qr_codes()
+    {
+        return view('customer_qrcode_links');
     }
 
 }

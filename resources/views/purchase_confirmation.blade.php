@@ -1,7 +1,7 @@
-@extends('layouts.website')
+@extends('layouts.website1')
 @section('content')
-    <div style="padding-top: 20px;" class="container">
-        <div class="row">
+    <div class="container">
+        <div style="margin-top: 20vh;margin-bottom: 20vh;" class="row">
             <div class="col-md-3"></div>
             <div class="col-md-6">
                 <h1 class="text-center">Book Purchase Confirmation</h1>
@@ -14,7 +14,6 @@
                         Purchase Details
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">Special title treatment</h5>
                         <table class="table table-striped table-hover">
                             <tbody>
                             <tr>
@@ -35,14 +34,21 @@
                             </tr>
                             <tr>
                                 <th scope="row">Payment Method</th>
-                                <td>{{$purchase->payment->paymentMethod->name}}</td>
+                                <td>{{$purchase->paymentMethod->name}}</td>
                             </tr>
 
                             </tbody>
                         </table>
-                        <a href="{{url($purchase->book->pdf_file)}}" class="btn btn-primary" target="_blank">Download PDF</a>
-                        <a href="{{url($purchase->book->epub_file)}}" class="btn btn-primary" target="_blank">Download Epub</a>
-                        <a href="{{url('/card/card.pdf')}}" class="btn btn-primary" target="_blank">Download Gift Card</a>
+                        <a  href="@if($purchase->book->pdf_file !=null){{url($purchase->book->pdf_file)}}@endif"
+                           style="background-color: #007E87;color: white;" class="btn btn-lg btn-block disabled" target="_blank">Download
+                            PDF
+                        </a>
+                        <a  href="@if($purchase->book->epub_file != null){{url($purchase->book->epub_file)}}@endif"
+                           style="background-color: #F4BD91;color: white;"
+                           class="btn btn-lg btn-block disabled" target="_blank">Download Epub
+                        </a>
+                        <a href="{{url('/card/card.pdf')}}" style="background-color: #547543;color: white;"
+                           class="btn btn-lg btn-block" target="_blank">Download Gift Card</a>
                     </div>
                 </div>
 

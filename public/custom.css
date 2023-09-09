@@ -5,6 +5,7 @@ html, body {
 /* Give the footer a fixed height */
 .footer {
     height: 60px;
+    background-color: #C35428;
 }
 
 /* Add padding to the bottom of the page */
@@ -12,19 +13,38 @@ html, body {
     padding-bottom: 60px; /* Same as the height of the footer */
 }
 
-/* Set full height for banner */
 .banner {
     height: calc(100vh - 56px);
-    background-image: url('https://via.placeholder.com/1500x800');
+    background-image: url('/card/banner.jpg');
     background-size: cover;
     background-position: center;
     position: relative;
 }
 
 .navbar {
-    background: url('https://via.placeholder.com/1500x800') no-repeat center center fixed;
-    background-size: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: transparent;
+    z-index: 1;
 }
+
+.navbar-brand img {
+    max-height: 60px; /* Set this to the height of your navbar */
+}
+
+
+.mobile-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: #f8f9fa;
+    display: none;
+    z-index: 2;
+}
+
 
 /* Center menu items */
 .navbar-nav {
@@ -46,6 +66,12 @@ html, body {
 .navbar-nav > li:not(:last-child) {
     margin-right: 40px;
 }
+
+
+.navbar-toggler-icon {
+    background-color: #999;
+}
+
 
 /* "RUTH TSOPOTSA" text */
 .banner-text {
@@ -76,6 +102,12 @@ html, body {
     left: 50%;
     transform: translateX(-50%);
     width: 200px;
+    background-color: #F4BD91;
+}
+
+.btn-outline-dark {
+    color: #007E87;
+    border-color: #007E87;
 }
 
 /* Book section */
@@ -153,8 +185,15 @@ cite {
     padding: 5px 10px;
 }
 
+.book-section h2 {
+    color: #C35428;
+}
+.book-section p {
+    color: #132839;
+}
+
 .book-section {
-    background-image: url('https://via.placeholder.com/1920x1080');
+    background-color: rgba(244, 189, 145, 0.15);
     background-size: cover;
     background-position: center;
     padding: 50px 0;

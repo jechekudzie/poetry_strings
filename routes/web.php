@@ -17,14 +17,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::get('/', [SiteController::class, 'index']);
-Route::get('/choose_copy/{bookType}', [SiteController::class, 'chooseCopy']);
+Route::get('/checkout/{bookType}', [SiteController::class, 'chooseCopy']);
 
 Route::post('/purchase/{bookType}', [SiteController::class, 'purchase']);
 
 Route::get('/paynow/{purchase}', [SiteController::class, 'paynow']);
 
-Route::get('/purchase_confirmation/{purchase}', [SiteController::class, 'purchase_confirmation']);
+Route::get('/purchase_confirmation/{purchase}', [SiteController::class, 'purchaseConfirmation']);
 
+Route::get('/qr_codes', [SiteController::class, 'qr_codes']);
 
 
 Route::get('/admin', function () {
